@@ -1,0 +1,7 @@
+{% for m in menu %}
+  {% if not forloop.last %}
+    <li><a href="#">{{ m.title }}</a></li>
+  {% else %}
+    <li class="last"><a href="#">{{ m.title }}</a></li>
+  {% endif %}
+{% endfor %}
