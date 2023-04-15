@@ -1,5 +1,5 @@
 from django.http import HttpResponse, HttpResponseNotFound, Http404
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 
 from .models import *
 
@@ -31,6 +31,18 @@ def show_category(request, cat_id):
     return render(request, 'pokemon/index.html', context=context)
 
 
+def show_post(request, post_slug):
+    post = get_object_or_404(Pokemon, slug=post_slug)
+
+    context = {
+        'post': post,
+        'title': post.title,
+        'cat_selected': post.cat_id,
+    }
+
+    return render(request, 'pokemon/post.html', context=context)
+
+
 def about(request):
     return render(request, 'pokemon/about.html', {'title': 'О сайте'})
 
@@ -39,7 +51,7 @@ def pageNotFound(request, exception):
     return HttpResponseNotFound('<h1>Страница не найдена</h1>')
 
 
-def archive(request, year):
-    if (int(year) > 2020):
-        return redirect('home', permanent=True)
-    return HttpResponse(f"<h1>Архив по годам</h1>{year}</p>")
+# def archive(request, year):
+#     if (int(year) > 2020):
+#         return redirect('home', permanent=True)
+#     return HttpResponse(f"<h1>Архив по годам</h1>{year}</p>")
