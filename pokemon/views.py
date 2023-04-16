@@ -1,6 +1,7 @@
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import redirect, render, get_object_or_404
 
+from .forms import AddPostForm
 from .models import *
 
 
@@ -43,13 +44,28 @@ def show_post(request, post_slug):
     return render(request, 'pokemon/post.html', context=context)
 
 
+def addpage(request):
+    if request.method == 'POST':
+        form = AddPostForm(request.POST)
+        if form.is_valid():
+            # print(form.cleaned_data)
+            try:
+                Pokemon.objects.create(**form.cleaned_data)
+                return redirect('home')
+            except:
+                form.add_error(None, 'Ошибка добавления поста')
+    else:
+        form = AddPostForm()
+
+    return render(request, 'pokemon/addpage.html', {'title': 'Добавление статьи', 'form': form})
+
+
 def about(request):
     return render(request, 'pokemon/about.html', {'title': 'О сайте'})
 
 
 def pageNotFound(request, exception):
     return HttpResponseNotFound('<h1>Страница не найдена</h1>')
-
 
 # def archive(request, year):
 #     if (int(year) > 2020):
