@@ -46,18 +46,14 @@ def show_post(request, post_slug):
 
 def addpage(request):
     if request.method == 'POST':
-        form = AddPostForm(request.POST)
+        form = AddPostForm(request.POST, request.FILES)
         if form.is_valid():
-            # print(form.cleaned_data)
-            try:
-                Pokemon.objects.create(**form.cleaned_data)
-                return redirect('home')
-            except:
-                form.add_error(None, 'Ошибка добавления поста')
+            #print(form.cleaned_data)
+            form.save()
+            return redirect('home')
     else:
         form = AddPostForm()
-
-    return render(request, 'pokemon/addpage.html', {'title': 'Добавление статьи', 'form': form})
+    return render(request, 'pokemon/addpage.html', {'form': form, 'title': 'Добавление статьи'})
 
 
 def about(request):
