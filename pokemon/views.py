@@ -1,21 +1,39 @@
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import redirect, render, get_object_or_404
+from django.views.generic import ListView, DetailView, CreateView
 
 from .forms import AddPostForm
 from .models import *
 
 
-def index(request):
-    posts = Pokemon.objects.all()
-    return render(request, 'pokemon/index.html', {'posts': posts,
-                                                  'cat_selected': 0,
-                                                  'title': 'Главная страница'})
+class PokemonHome(ListView):
+    model = Pokemon
+    template_name = 'pokemon/index.html'
+    context_object_name = 'posts'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Главная страница'
+        return context
+
+    def get_queryset(self):
+        return Pokemon.objects.filter(is_published=True)
 
 
-def categories(request, cat):
-    if (request.POST):
-        print(request.POST)
-    return HttpResponse(f"<h1>Статьи по категориям</h1>{cat}</p>")
+class PokemonCategory(ListView):
+    model = Pokemon
+    template_name = 'Pokemon/index.html'
+    context_object_name = 'posts'
+    allow_empty = False
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Категория - ' + str(context['posts'][0].cat)
+        context['cat_selected'] = context['posts'][0].cat_id
+        return context
+
+    def get_queryset(self):
+        return Pokemon.objects.filter(cat__slug=self.kwargs['cat_slug'], is_published=True)
 
 
 def show_category(request, cat_id):
@@ -32,28 +50,26 @@ def show_category(request, cat_id):
     return render(request, 'pokemon/index.html', context=context)
 
 
-def show_post(request, post_slug):
-    post = get_object_or_404(Pokemon, slug=post_slug)
+class ShowPost(DetailView):
+    model = Pokemon
+    template_name = 'pokemon/post.html'
+    slug_url_kwarg = 'post_slug'
+    context_object_name = 'post'
 
-    context = {
-        'post': post,
-        'title': post.title,
-        'cat_selected': post.cat_id,
-    }
-
-    return render(request, 'pokemon/post.html', context=context)
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = context['post']
+        return context
 
 
-def addpage(request):
-    if request.method == 'POST':
-        form = AddPostForm(request.POST, request.FILES)
-        if form.is_valid():
-            #print(form.cleaned_data)
-            form.save()
-            return redirect('home')
-    else:
-        form = AddPostForm()
-    return render(request, 'pokemon/addpage.html', {'form': form, 'title': 'Добавление статьи'})
+class AddPage(CreateView):
+    form_class = AddPostForm
+    template_name = 'pokemon/addpage.html'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Добавление статьи'
+        return context
 
 
 def about(request):
@@ -62,8 +78,3 @@ def about(request):
 
 def pageNotFound(request, exception):
     return HttpResponseNotFound('<h1>Страница не найдена</h1>')
-
-# def archive(request, year):
-#     if (int(year) > 2020):
-#         return redirect('home', permanent=True)
-#     return HttpResponse(f"<h1>Архив по годам</h1>{year}</p>")
