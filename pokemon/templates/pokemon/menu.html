@@ -7,10 +7,10 @@
 {#{% endfor %}#}
 
 
-{% for m in menu %}
-    {% if not forloop.last %}
-        <li><a href="{% url 'add_page' %}">{{ m.title }}</a></li>
-    {% else %}
-        <li class="last"><a href="{% url 'add_page' %}">{{ m.title }}</a></li>
-    {% endif %}
-{% endfor %}
+{#{% for m in menu %}#}
+{#    {% if not forloop.last %}#}
+{#        <li><a href="{% url 'add_page' %}">{{ m.title }}</a></li>#}
+{#    {% else %}#}
+{#        <li class="last"><a href="{% url 'add_page' %}">{{ m.title }}</a></li>#}
+{#    {% endif %}#}
+{#{% endfor %}#}
