@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse_lazy
@@ -6,13 +7,14 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import AddPostForm
 from .models import *
-from .utils import DataMixin
+from .utils import *
 
 
 class PokemonHome(DataMixin, ListView):
     model = Pokemon
     template_name = 'pokemon/index.html'
     context_object_name = 'posts'
+    # paginate_by = 3
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -76,7 +78,12 @@ def login(request):
 
 
 def about(request):
-    return render(request, 'pokemon/about.html', {'title': 'О сайте'})
+    contact_list = Pokemon.objects.all()
+    paginator = Paginator(contact_list, 3)
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'pokemon/about.html', {'page_obj': page_obj, 'menu': menu, 'title': 'О сайте'})
 
 
 def pageNotFound(request, exception):
