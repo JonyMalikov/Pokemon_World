@@ -27,7 +27,7 @@ class PokemonHome(DataMixin, ListView):
         return context
 
     def get_queryset(self):
-        return Pokemon.objects.filter(is_published=True)
+        return Pokemon.objects.filter(is_published=True).select_related('cat')
 
 
 class PokemonCategory(DataMixin, ListView):
@@ -44,7 +44,8 @@ class PokemonCategory(DataMixin, ListView):
         return dict(list(context.items()) + list(c_def.items()))
 
     def get_queryset(self):
-        return Pokemon.objects.filter(cat__slug=self.kwargs['cat_slug'], is_published=True)
+        return Pokemon.objects.filter(cat__slug=self.kwargs['cat_slug'],
+                                      is_published=True).select_related('cat')
 
 
 class AddPage(LoginRequiredMixin, DataMixin, CreateView):
