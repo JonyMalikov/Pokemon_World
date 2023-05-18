@@ -1,15 +1,13 @@
 from django.contrib.auth import logout, login
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.views import LoginView
 from django.core.paginator import Paginator
-from django.http import HttpResponse, HttpResponseNotFound, Http404
-from django.shortcuts import redirect, render, get_object_or_404
+from django.http import HttpResponseNotFound, Http404
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import AddPostForm, RegisterUserForm, LoginUserForm, ContactForm
-from .models import *
 from .utils import *
 
 
@@ -117,12 +115,6 @@ class ContactFormView(DataMixin, FormView):
         print(form.cleaned_data)
         return redirect('home')
 
-# def contact(request):
-#     return HttpResponse("Обратная связь")
-
-
-# def login(request):
-#     return HttpResponse("Авторизация")
 
 
 def about(request):
